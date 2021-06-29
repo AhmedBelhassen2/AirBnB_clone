@@ -6,6 +6,8 @@ Contains the Base class for the AirBnB clone.
 import uuid
 from datetime import datetime
 import models
+
+
 class BaseModel:
 
     """Class for base model of object hierarchy."""
