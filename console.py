@@ -2,23 +2,21 @@
 'that contains the entry point of the command interpreter'
 import cmd
 import sys
-from models.base_model import BaseModel
+import shlex
 import models
-from models import storage
+storage = models.storage
 from models.amenity import Amenity
 from models.city import City
 from models.place import Place
 from models.review import Review
 from models.state import State
 from models.user import User
-import shlex
-
-storage = models.storage
 
 class HBNBCommand(cmd.Cmd):
     'cmd class'
     prompt = '(hbnb)'
     classes = ["BaseModel","Amenity","City","Place","Review","User"]
+
     def do_quit(self, arg):
         'Quit command to exit the program'
         return True
@@ -28,21 +26,21 @@ class HBNBCommand(cmd.Cmd):
         return True
 
     def do_create(self, arg):
-        """Creates"""
-        if len(arg) == 0:
+        """Creates a new instance of BaseModel"""
+        args = shlex.split(arg)
+        if len(args) == 0:
             print("** class name missing **")
+            return False
+        if args[0] in self.classes:
+            instance = self.classes[args[0]]()
         else:
-            try:
-                args = arg.split()
-                new_inst = eval("{}()".format(args[0]))
-                new_inst.save()
-                print(new_inst.id)
-            except Exception:
-                print("** class doesn't exist **")
+            print("** class doesn't exist **")
+            return False
+        instance.save()
+        print(instance.id)
 
-    
     def do_show(self, arg):
-        'Prints the string representation of an instance based on the class name and id'
+        'Prints the string representation'
         args = shlex.split(arg)
         if len(args) == 0:
             print("** class name missing **")
@@ -115,24 +113,11 @@ class HBNBCommand(cmd.Cmd):
         elif len(list_arg) == 3:
             print("** value missing **")
         else:
-            key = ''
-            key = list_arg[0] + '.' + list_arg[1]
-            if key in dic_all:
-                setattr(dic_all[key], list_arg[2], list_arg[3])
-                models.storage.save()
-            else:
-                print("** no instance found **")
-                return
-
-    def do_count(self, args):
-        '''Counts the number of instances of an object'''
-        objs = storage.all()
-        count = 0
-        for item in objs:
-            if args in item:
-                count += 1
-        print(count)
+            key = "{}.{}".format(args[0], args[1])
+            arg_type = type(eval(args[3]))
+            attr = args[3].strip('\'\"')
+            setattr(storage.all()[key], args[2], arg_type(attr))
+            storage.all()[key].save()
 
 if __name__ == '__main__':
-    prompt = HBNBCommand()
-    prompt.cmdloop()
+    HBNBCommand().cmdloop()
