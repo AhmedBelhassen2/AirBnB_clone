@@ -11,6 +11,7 @@ from models.place import Place
 from models.review import Review
 from models.state import State
 from models.user import User
+from models.base_model import BaseModel
 
 class HBNBCommand(cmd.Cmd):
     'cmd class'
@@ -32,7 +33,11 @@ class HBNBCommand(cmd.Cmd):
             print("** class name missing **")
             return False
         if args[0] in self.classes:
-            instance = self.classes[args[0]]()
+            for i in range(len(self.classes)):
+                if self.classes[i] == args[0]:
+                    index = i
+                break
+            instance = eval(self.classes[index])()
         else:
             print("** class doesn't exist **")
             return False
