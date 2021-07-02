@@ -26,6 +26,10 @@ class HBNBCommand(cmd.Cmd):
         'EOF command to exit the program'
         return True
 
+    def emptyline(self):
+        """if an empty line is entered it is passed waits command"""
+        pass
+
     def do_create(self, arg):
         """Creates a new instance of BaseModel"""
         args = shlex.split(arg)
